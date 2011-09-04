@@ -3,6 +3,7 @@
 
 chat/*.beam
 chat/.*.swp
+chat/*.dump
 
 basic/*.beam
 basic/.*.swp

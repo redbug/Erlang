@@ -3,36 +3,46 @@
 -compile(export_all).
 
 start() ->
-    Pid = spawn(message_router, route_messages, [dict:new()]),
-    erlang:register(?SERVER, Pid),
-    Pid.
+    global:trans({?SERVER, ?SERVER},
+		 fun() ->
+		    case global:whereis_name(?SERVER) of
+			undefined ->
+			    Pid = spawn(message_router, route_messages, [dict:new()]),
+			    global:register_name(?SERVER, Pid);
+			_ ->
+			    ok
+			end
+		    end).
 
 stop() ->
-    ?SERVER ! shutdown.
+    global:trans({?SERVER, ?SERVER},
+		 fun() ->
+		    case global:whereis_name(?SERVER) of
+			undefined ->
+			    ok;
+			_ ->
+			    global:send(?SERVER, shutdown)
+		    end
+		 end).
 
 register_nick(ClientName, ClientPid) ->
-    ?SERVER ! {register_nick, ClientName, ClientPid}.
+    global:send(?SERVER, {register_nick, ClientName, ClientPid}).
 
 unregister_nick(ClientName) ->
-    ?SERVER ! {unregister_nick, ClientName}.
+    global:send(?SERVER, {unregister_nick, ClientName}).
 
 send_chat_message(Addressee, MessageBody) ->
-    ?SERVER ! {send_chat_msg, Addressee, MessageBody}.
+    global:send(?SERVER, {send_chat_msg, Addressee, MessageBody}).
 
 route_messages(Clients) ->
     receive
 	{send_chat_msg, ClientName, MessageBody} ->
-	    ?SERVER ! {recv_chat_msg, ClientName, MessageBody},
-	    route_messages(Clients);
-
-	{recv_chat_msg, ClientName, MessageBody} ->
 	    case dict:find(ClientName, Clients) of
 		{ok, ClientPid} ->
 		    ClientPid ! {printmsg, MessageBody};
 		error ->
 		    io:format("Error! Unknown client: ~p~n", [ClientName])
 	    end,
-
 	    route_messages(Clients);
 
 	{register_nick, ClientName, ClientPid} ->
