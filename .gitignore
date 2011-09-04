@@ -1,2 +1,5 @@
 .*.swp
-.beam
+*.beam
+
+chat/*.beam
+chat/.*.swp
