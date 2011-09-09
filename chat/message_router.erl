@@ -3,10 +3,12 @@
 -compile(export_all).
 
 start() ->
-    server_util:start(?SERVER, {message_router, route_messages, [dict:new()]}).
+    server_util:start(?SERVER, {message_router, route_messages, [dict:new()]}),
+    message_store:start().
 
 stop() ->
-    server_util:stop(?SERVER).
+    server_util:stop(?SERVER),
+    message_store:stop().
 
 register_nick(ClientName, ClientPid) ->
     global:send(?SERVER, {register_nick, ClientName, ClientPid}).
@@ -24,11 +26,14 @@ route_messages(Clients) ->
 		{ok, ClientPid} ->
 		    ClientPid ! {printmsg, MessageBody};
 		error ->
-		    io:format("Error! Unknown client: ~p~n", [ClientName])
+		    message_store:save_message(ClientName, MessageBody),
+		    io:format("Archived message for ~p~n", [ClientName])
 	    end,
 	    route_messages(Clients);
 
 	{register_nick, ClientName, ClientPid} ->
+	    Messages = message_store:find_messages(ClientName),
+	    lists:foreach(fun(Msg) -> ClientPid ! {printmsg, Msg} end, Messages),
 	    route_messages(dict:store(ClientName, ClientPid, Clients));
 
 	{unregister_nick, ClientName} ->

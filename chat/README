@@ -1,0 +1,31 @@
+% create two nodes 
+erl -sname foo -setcookie erlang
+erl -sname bar -setcookie erlang
+
+at foo node
+> c(chat_client).
+> c(message_router).
+> c(message_store).
+> net_adm:ping('bar@Chao-Wei-Mings-MacBook').
+pong
+> chat_client:start_router().
+yes
+> global:registered_names().
+[message_store,message_router]
+> chat_client:send_message("Waldo", "Where's Waldo?").
+Archived message for "Waldo"
+
+
+at bar node
+> chat_client:register_nickname("Waldo"). 
+"Waldo" received: "Where's Waldo?"
+> chat_client:send_message("Fred", "Hello, Fred!").
+
+at foo node
+> chat_client:register_nickname("Fred").
+"Fred" received: "Hello Fred!"
+> chat_client:send_message("Waldo", "Goodbye").
+
+at bar node
+"Waldo" received: "Goodbye"
+ 
