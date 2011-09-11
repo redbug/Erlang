@@ -54,10 +54,3 @@ route_messages(Clients) ->
 	    route_messages(Clients)
     end.
 
-
-%% Testing
-%% c(message_router.erl).
-%% P = spawn(message_router, route_messages,  []).
-%% P ! {send_chat_msg, P, "Hello, World!"}.   % send P itself a message.
-%% P ! {huh}.
-

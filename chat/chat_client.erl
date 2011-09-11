@@ -23,7 +23,3 @@ handle_message(Nickname) ->
 
 start_router() ->
     message_router:start().
-% c(chat_client.erl).
-% chat_client:send_message(P, P, "Hello from a client!").
-% P1 = spawn(message_router, route_messages, []).
-% chat_client:send_message(P, P1, "Hello from client on message router #1").

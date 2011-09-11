@@ -5,6 +5,7 @@
 chat/*.beam
 chat/.*.swp
 chat/*.dump
+chat/Mnesia*
 
 basic/*.beam
 basic/.*.swp
