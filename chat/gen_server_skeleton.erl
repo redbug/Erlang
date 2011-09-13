@@ -21,7 +21,7 @@ start_link() ->
 init([]) ->
     {ok, #state{}}.
 
-handle_call({save_msg, Addressee, Body}, _From, State) ->
+handle_call(_Request, _From, State) ->
     Reply =ok,
     {reply, Reply, State}.
 
