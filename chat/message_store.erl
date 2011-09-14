@@ -37,6 +37,8 @@ shutdown() ->
 %% gen_server callbacks
 
 init([]) ->
+    process_flag(trap_exit, true),
+    io:format("~p (~p) starting...~n", [?MODULE, self()]),
     init_store(),
     {ok, #state{}}.
 

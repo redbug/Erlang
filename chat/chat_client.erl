@@ -21,5 +21,6 @@ handle_message(Nickname) ->
 	    ok
     end.
 
-start_router() ->
-    message_router:start_link().
+%% start by message_router_sup
+%start_router() ->
+%    message_router:start_link().

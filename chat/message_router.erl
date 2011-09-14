@@ -28,7 +28,10 @@ shutdown() ->
 %% gen_server callbacks
 
 init([]) ->
-    message_store:start_link(),
+    % start by message_router_sup instead
+    %message_store:start_link(),
+    process_flag(trap_exit, true),
+    io:format("~p (~p) starting...~n", [?MODULE, self()]),
     {ok, dict:new()}.
 
 handle_call({register_nick, ClientName, ClientPid}, _From, Clients) ->
@@ -62,7 +65,7 @@ handle_call(_Request, _From, State) ->
     {reply, Reply, State}.
 
 handle_cast(stop, State) ->
-    message_store:shutdown(),
+    %message_store:shutdown(),
     {stop, normal, State};
 
 handle_cast(_Msg, State) ->
